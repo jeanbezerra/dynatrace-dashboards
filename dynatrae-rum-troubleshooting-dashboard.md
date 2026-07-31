@@ -1,8 +1,38 @@
 
 Crie duas variáveis de seleção única no Dashboard:
 
-- `$frontend`: valor de frontend.name
-- `$backend_service`: ID SERVICE-... da API/gateway utilizada pela aplicação
+Variável frontend
+- Nome: frontend
+- Tipo: DQL
+- Multi-select: desativado
+
+```sh
+fetch user.events, from: now() - 30d
+| filter isNotNull(frontend.name)
+| summarize by: {
+    frontend.name
+  }
+| sort frontend.name asc
+| fields frontend.name
+```
+
+Variável backendService
+Esta versão retorna o ID exato SERVICE-..., compatível com a query principal.
+- Nome: backendService
+- Tipo: DQL
+- Multi-select: desativado
+
+```sh
+timeseries request_count = sum(dt.service.request.count),
+  by: {
+    dt.entity.service
+  },
+  from: now() - 30d
+
+| fields backendService = toString(dt.entity.service)
+
+| sort backendService asc
+```
 
 ```sh
 timeseries backend_requests = sum(dt.service.request.count, default: 0),

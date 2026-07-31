@@ -1,10 +1,10 @@
+```sh
 timeseries backend_requests = sum(dt.service.request.count, default: 0),
   filter: {
     dt.entity.service == $backend_service
   },
   interval: 5m,
   nonempty: true
-
 | join [
     timeseries {
       sessions = sum(
@@ -71,3 +71,47 @@ timeseries backend_requests = sum(dt.service.request.count, default: 0),
     rum.browser_requests,
     rum_request_index,
     collection_status
+```
+
+
+```sh
+fetch user.events
+
+| filter frontend.name == $frontend
+
+| makeTimeseries {
+    total_events = count(default: 0),
+
+    sessions = countDistinctApprox(
+      dt.rum.session.id,
+      default: 0
+    ),
+
+    actions = countIf(
+      characteristics.has_user_action == true,
+      default: 0
+    ),
+
+    interactions = countIf(
+      characteristics.has_user_interaction == true,
+      default: 0
+    ),
+
+    navigations = countIf(
+      characteristics.has_navigation == true,
+      default: 0
+    ),
+
+    request_events = countIf(
+      characteristics.has_request == true,
+      default: 0
+    ),
+
+    csp_violations = countIf(
+      characteristics.has_csp_violation == true,
+      default: 0
+    )
+  },
+  interval: 5m,
+  nonempty: true
+```

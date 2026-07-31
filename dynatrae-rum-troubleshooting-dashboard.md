@@ -1,3 +1,9 @@
+
+Crie duas variáveis de seleção única no Dashboard:
+
+- `$frontend`: valor de frontend.name
+- `$backend_service`: ID SERVICE-... da API/gateway utilizada pela aplicação
+
 ```sh
 timeseries backend_requests = sum(dt.service.request.count, default: 0),
   filter: {
